@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	grpcSvc "github.com/francois-poidevin/briefly.public/internal/app/grpc"
 	"github.com/francois-poidevin/briefly.public/internal/app/services"
@@ -25,7 +27,7 @@ var startHttpCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Initialize config
-		// initConfig()
+		initConfig()
 
 		//setup gRPC connection
 		gRPCClient, errGrpc := setup()
@@ -43,21 +45,43 @@ var startHttpCmd = &cobra.Command{
 		}
 
 		r := gin.Default()
-		r.GET("/shortcoder/:url", svc.ShortCode)
+		r.GET("/shortcoder/:url", svc.ShortCode) //TODO change to a PUT with a body {"url":"http://www.foo.com"}
 		r.GET("/unshortcoder/:hash", svc.UnShortCode)
-		r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
+		log.WithContext(ctx).Info("Port " + conf.Briefly_public.REST.ListenPort)
+		r.Run(conf.Briefly_public.REST.ListenPort) // listen and serve
 	},
 }
 
 func setup() (*grpcSvc.GrpcService, error) {
 
-	gRPCURL := "localhost:5556" //TODO: put gRPC server URL in a configuration file
+	//log handling
+	log = logrus.New()
+
+	fmt.Println(fmt.Sprintf("log format json: %t ", conf.Log.JSONFormatter))
+	if conf.Log.JSONFormatter {
+		fmt.Println("log format: Json")
+		log.Formatter = new(logrus.JSONFormatter)
+	} else {
+		fmt.Println("log format: Text")
+		log.Formatter = new(logrus.TextFormatter)                     //default
+		log.Formatter.(*logrus.TextFormatter).DisableColors = true    // remove colors
+		log.Formatter.(*logrus.TextFormatter).DisableTimestamp = true // remove timestamp from test output
+	}
+
+	lvl, err := logrus.ParseLevel(conf.Log.Level)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"Error": err,
+		}).Fatal("Not success to parse logrus log level")
+	}
+	log.Level = lvl
+	log.Out = os.Stdout
 
 	// Perform dialing to BB gRPC service
 	conn, errGrpcConn := grpc.DialContext(
 		ctx,
-		gRPCURL,
+		conf.Briefly_public.Briefly.Adress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}),
@@ -68,13 +92,18 @@ func setup() (*grpcSvc.GrpcService, error) {
 	}
 
 	grpcBrieflyClient := schemaV1.NewSchemaAPIClient(conn)
+
 	log.WithContext(ctx).WithFields(logrus.Fields{
-		"URL":  gRPCURL,
-		"conn": conn,
+		"URL":        conf.Briefly_public.Briefly.Adress,
+		"conn State": conn.GetState(),
 	}).Debug("gRPC schema connection initialized")
 
 	gRPCSvc := grpcSvc.GrpcService{
 		GrpcClient: grpcBrieflyClient,
 	}
 	return &gRPCSvc, nil
+}
+
+func init() {
+	startHttpCmd.Flags().StringVar(&cfgFile, "config", "", "config file")
 }

@@ -45,10 +45,9 @@ var startHttpCmd = &cobra.Command{
 		}
 
 		r := gin.Default()
-		r.GET("/shortcoder/:url", svc.ShortCode) //TODO change to a PUT with a body {"url":"http://www.foo.com"}
+		r.POST("/shortcoder", svc.ShortCode)
 		r.GET("/unshortcoder/:hash", svc.UnShortCode)
 
-		log.WithContext(ctx).Info("Port " + conf.Briefly_public.REST.ListenPort)
 		r.Run(conf.Briefly_public.REST.ListenPort) // listen and serve
 	},
 }
@@ -74,6 +73,7 @@ func setup() (*grpcSvc.GrpcService, error) {
 		log.WithFields(logrus.Fields{
 			"Error": err,
 		}).Fatal("Not success to parse logrus log level")
+		return nil, err
 	}
 	log.Level = lvl
 	log.Out = os.Stdout

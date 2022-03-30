@@ -16,6 +16,11 @@ type Services struct {
 	GRPCClient *grpcSvc.GrpcService
 }
 
+// Binding from JSON
+type ShortCode struct {
+	Url string `form:"url" json:"url" xml:"url" binding:"required"`
+}
+
 func (s *Services) UnShortCode(c *gin.Context) {
 	hash := c.Param("hash")
 	s.Log.WithContext(s.Ctx).Info("hash parameter: " + hash)
@@ -33,10 +38,16 @@ func (s *Services) UnShortCode(c *gin.Context) {
 }
 
 func (s *Services) ShortCode(c *gin.Context) {
-	url := c.Param("url")
-	s.Log.WithContext(s.Ctx).Info("url parameter: " + url)
+	var json ShortCode
 
-	hash, errUnShrt := s.GRPCClient.GetShortCodeHash(s.Ctx, url)
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	s.Log.WithContext(s.Ctx).Info("url parameter: " + json.Url)
+
+	hash, errUnShrt := s.GRPCClient.GetShortCodeHash(s.Ctx, json.Url)
 	if errUnShrt != nil {
 		s.Log.WithContext(s.Ctx).WithFields(logrus.Fields{
 			"Error": errUnShrt,

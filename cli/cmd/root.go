@@ -38,33 +38,6 @@ func Execute() {
 }
 
 func init() {
-	// // Initialize config
-	// initConfig()
-
-	// //log handling
-	// log = logrus.New()
-
-	// fmt.Println(fmt.Sprintf("log format json: %t ", conf.Log.JSONFormatter))
-	// if conf.Log.JSONFormatter {
-	// 	fmt.Println("log format: Json")
-	// 	log.Formatter = new(logrus.JSONFormatter)
-	// } else {
-	// 	fmt.Println("log format: Text")
-	// 	log.Formatter = new(logrus.TextFormatter) //default
-	// }
-	// log.Formatter.(*logrus.TextFormatter).DisableColors = true    // remove colors
-	// log.Formatter.(*logrus.TextFormatter).DisableTimestamp = true // remove timestamp from test output
-	// log.Level = logrus.TraceLevel
-
-	// lvl, err := logrus.ParseLevel(conf.Log.Level)
-	// if err != nil {
-	// 	log.WithFields(logrus.Fields{
-	// 		"Error": err,
-	// 	}).Fatal("Not success to parse logrus log level")
-	// }
-	// log.Level = lvl
-	// log.Out = os.Stdout
-
 	rootCmd.AddCommand(startHttpCmd)
 	rootCmd.AddCommand(configCmd)
 }

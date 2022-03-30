@@ -9,12 +9,15 @@ This repository concern the REST service to expose with gin-tonic golang library
 ## Endpoints
 ### shortcode URL
 
-GET method:  /shortcoder/:url
+POST method:  /shortcoder
 
-####  Path parameter
+####  Body content
 
-url: URL to shortcode
+POST json body: 
 
+```json
+{"url": "http://www.google.fr"}
+```
 #### Return reponse
 
 GET a id of the URL in return HTTP code 200
@@ -40,7 +43,7 @@ $ go mod vendor
 
 ### Bin generation
 ```shell
-$ go build -o bin/briefly
+$ go build -o bin/briefly.public
 ```
 ## Usage
 ### Pre-requisite
@@ -90,7 +93,7 @@ will generate a default configuration file
 
 ```
 
-store it as toml file in example in ./conf/briefly.public.conf.toml file
+store it as toml file in example 'conf' folder in './conf/briefly.public.conf.toml' file
 
 ### Run HTTP server
 ```shell
@@ -100,13 +103,13 @@ $ ./bin/briefly.public startHttp --config ./conf/briefly.public.conf.toml
 ### Call endpoints
 #### shortcode URL endpoint
 ```shell
-$ curl 127.0.0.1:8080/shortcoder/test
+$ curl -X POST  http://127.0.0.1:8080/shortcoder/ -H 'content-type: application/json' -d '{ "url": "https://www.google.com" }'
 2073697506084
 ```
 
 #### unshortcode URL endpoint
 ```shell
-$ curl 127.0.0.1:8080/unshortcoder/test 
+$ curl 127.0.0.1:8080/unshortcoder/2073697506084 
 <a href="https://www.google.com">Moved Permanently</a>.
 ```
 

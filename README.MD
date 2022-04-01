@@ -36,15 +36,15 @@ A redirect HTTP code 301 with the unshortcoded URL associated to the path parame
 
 ## Compilation
 
-### Dependancies
-```shell
-$ go mod vendor
-```
+### Mage compilation
+#### Pre-requisite
+Please install [mage](https://github.com/magefile/mage)
 
-### Bin generation
+#### Dependancies / Generate artifact
 ```shell
-$ go build -o bin/briefly.public
+$ mage
 ```
+An artifact named 'briefly.public' is generated in './bin/' folder
 ## Usage
 ### Pre-requisite
 The briefly gRPC server have to run to execute the backend work.
@@ -93,7 +93,7 @@ will generate a default configuration file
 
 ```
 
-store it as toml file in example 'conf' folder in './conf/briefly.public.conf.toml' file
+store it as toml file in example in 'conf' folder onto './conf/briefly.public.conf.toml' file
 
 ### Run HTTP server
 ```shell

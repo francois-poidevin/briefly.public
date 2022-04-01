@@ -16,26 +16,23 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var (
-	ctx, cancel = context.WithCancel(context.Background())
-)
+var ctx, cancel = context.WithCancel(context.Background())
 
 var startHttpCmd = &cobra.Command{
 	Use:   "startHttp",
 	Short: "Allow to start REST API service around tracking of all flights",
 	Long:  `The HTTP Rest API service start with config parameters. Several endpoints are available `,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		// Initialize config
 		initConfig()
 
-		//setup gRPC connection
+		// setup gRPC connection
 		gRPCClient, errGrpc := setup()
 		if errGrpc != nil {
 			log.WithContext(ctx).WithFields(logrus.Fields{
 				"Error": errGrpc,
 			}).Error("gRPC connection failed")
-			//TODO: do a return to stop the service ?
+			// TODO: do a return to stop the service ?
 		}
 
 		svc := services.Services{
@@ -53,8 +50,7 @@ var startHttpCmd = &cobra.Command{
 }
 
 func setup() (*grpcSvc.GrpcService, error) {
-
-	//log handling
+	// log handling
 	log = logrus.New()
 
 	fmt.Println(fmt.Sprintf("log format json: %t ", conf.Log.JSONFormatter))
@@ -63,7 +59,7 @@ func setup() (*grpcSvc.GrpcService, error) {
 		log.Formatter = new(logrus.JSONFormatter)
 	} else {
 		fmt.Println("log format: Text")
-		log.Formatter = new(logrus.TextFormatter)                     //default
+		log.Formatter = new(logrus.TextFormatter)                     // default
 		log.Formatter.(*logrus.TextFormatter).DisableColors = true    // remove colors
 		log.Formatter.(*logrus.TextFormatter).DisableTimestamp = true // remove timestamp from test output
 	}

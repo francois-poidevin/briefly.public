@@ -14,10 +14,9 @@ type GrpcService struct {
 
 // GetUnshortcodedURL get the unshortCoded URL from the gRPC server
 func (g *GrpcService) GetUnshortcodedURL(ctx context.Context, hash string) (string, error) {
-
 	gResp, gErr := g.GrpcClient.GetUnShortCodedURL(ctx, &schemav1.GetUnShortCodedURLRequest{Hash: hash})
 	if gErr != nil {
-		fmt.Println("Error Dude !!") //TODO: change to real log
+		fmt.Println("Error Dude !!") // TODO: change to real log
 		return "", gErr
 	}
 
@@ -27,7 +26,7 @@ func (g *GrpcService) GetUnshortcodedURL(ctx context.Context, hash string) (stri
 func (g *GrpcService) GetShortCodeHash(ctx context.Context, url string) (string, error) {
 	gResp, gErr := g.GrpcClient.GetShortCodeHash(ctx, &schemav1.GetShortCodeHashRequest{Url: url})
 	if gErr != nil {
-		fmt.Println("Error Dude !!") //TODO: change to real log
+		fmt.Println("Error Dude !!") // TODO: change to real log
 		return "", gErr
 	}
 
